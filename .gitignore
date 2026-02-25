@@ -1,0 +1,11 @@
+*.o
+*.out
+
+*.exe
+*.app
+chess_v2
+
+.DS_Store
+
+.vscode/
+.idea/
