@@ -1,52 +1,41 @@
-C++ Bitboard Chess Engine
-A high-performance chess engine built from scratch in C++, utilizing 64-bit integer bitboards for board representation and move generation.
+# C++ Bitboard Chess Engine
 
-Current Status: Phase 1 Complete (Move Generation)
-The engine currently possesses a fully functional Pseudo-Legal Move Generator. It can take a board state, analyze the position using bitwise operations, and generate a list of all physically possible moves for the active color, including directional pawn pushes, leaper jumps, and blocked sliding raycasts.
+A high-performance chess engine built from scratch in C++, utilizing 64-bit integer bitboards for board representation and move generation. The project architecture is designed to support a high-speed C++ engine core that will eventually interface with a custom Python-based UI.
 
-⚙️ Core Architecture & Features
-1. Bitboard Board Representation (board.cpp / board.h)
-64-bit State: The board is represented using an array of std::uint64_t bitboards, separating pieces by color (White/Black) and type (Pawn, Knight, Bishop, Rook, Queen, King).
+## Current Status: Phase 1 (Move Generation)
+The engine currently features a fully functional Pseudo-Legal Move Generator. It processes board states using low-level bitwise operations to generate a complete list of physically possible moves for the active color, encompassing directional pawn pushes, leaper jumps, and blocked sliding raycasts.
 
-Aggregate Bitboards: Maintains updated whitePieces, blackPieces, and allPieces bitboards for instant occupancy lookups.
+## Core Architecture
 
-Initialization: capable of resetting to the standard chess starting position and printing the board in an ASCII format for visual debugging.
+### 1. Bitboard Representation (`board.cpp` / `board.h`)
+* **64-bit State:** The board is represented using arrays of `std::uint64_t` bitboards, separating pieces by color and type.
+* **Aggregate Bitboards:** Maintains updated `whitePieces`, `blackPieces`, and `allPieces` bitboards for instant occupancy lookups.
+* **Coordinate System:** Follows a standard 0-63 index mapping (a1 = 0, h8 = 63) with upward/rightward growth.
 
-2. Pre-calculated Leaper Attacks (movegen.cpp / movegen.h)
-Knights & Kings: Attack patterns for non-sliding pieces are calculated once at startup (init()) and stored in lookup arrays (knightAttacks[64], kingAttacks[64]).
+### 2. Leaper Move Generation (`movegen.cpp` / `movegen.h`)
+* **Pre-calculated Arrays:** Attack patterns for Knights and Kings are calculated once at startup (`init()`) and stored in lookup tables.
+* **Directional Pawn Captures:** Pre-calculated capture tables handle White (Up) and Black (Down) pawn attacks.
+* **Edge Wrap Prevention:** Strict mathematical masking (`notAFile`, `notHFile`, etc.) prevents pieces from wrapping around the board edges during bit shifts.
 
-Pawn Captures: Pre-calculated directional capture tables (pawnAttacks[2][64]) handling White (Up) and Black (Down) pawn attacks.
+### 3. Sliding Piece Raycasting
+* **On-The-Fly Generation:** Utilizes dynamic loops to calculate raycasts for Bishops, Rooks, and Queens (`getRookAttacks`, `getBishopAttacks`).
+* **Occupancy Detection:** Rays terminate instantly upon intersecting with the `allPieces` bitboard to handle captures and friendly blockers.
+* **Magic Bitboard Preparation:** Includes foundational "Outer Edge Exclusion" masks (`maskRookAttacks`, `maskBishopAttacks`) designed for a future upgrade to Magic Bitboard hashing.
 
-Edge Wrap Prevention: Mathematical masking (notAFile, notHFile, etc.) safely prevents pieces from wrapping around the edges of the board.
+### 4. Hardware-Accelerated Bit Manipulation
+* **Trailing Zero Count:** Leverages the `__builtin_ctzll` compiler intrinsic to extract piece locations from bitboards in a single CPU cycle.
+* **Brian Kernighan's Algorithm:** Uses `bb &= bb - 1` to systematically clear the least significant bit, allowing loop-free piece extraction.
+* **Bitwise Pawn Logic:** Calculates single and double pawn pushes simultaneously using fast bitwise shifts and rank-mask filtering.
 
-3. On-The-Fly Raycasting for Sliders
-Bishops, Rooks, & Queens: Utilizes dynamic for loops to shoot rays across the board (getRookAttacks, getBishopAttacks).
+## Roadmap
 
-Occupancy Detection: Rays stop instantly upon intersecting with the allPieces bitboard, capturing enemy pieces while preventing phasing through blockers.
+### Engine Core
+- [ ] Implement `makeMove()` and `unmakeMove()` to update bitboards dynamically.
+- [ ] Implement Legal Move Filtering (preventing moves that leave the King in check).
+- [ ] Add special rules: Castling, En Passant, and Pawn Promotion.
+- [ ] Develop board evaluation function (material + positional scoring).
+- [ ] Implement Minimax search algorithm with Alpha-Beta Pruning.
 
-Mask Generation: Includes foundational "Outer Edge Exclusion" masks (maskRookAttacks, maskBishopAttacks) prepared for a future upgrade to Magic Bitboards.
-
-4. Hardware-Accelerated Bit Manipulation
-Trailing Zero Count: Leverages Apple Clang's __builtin_ctzll hardware intrinsic to extract piece locations from bitboards in a single CPU cycle.
-
-Brian Kernighan's Algorithm: Uses bb &= bb - 1 to systematically clear the least significant bit, allowing loop-free piece extraction.
-
-Bitwise Pawn Logic: Calculates single and double pawn pushes simultaneously using fast bitwise shifts (<< 8, >> 8) and rank-mask filtering.
-
-📂 Project Structure
-main.cpp: The entry point. Initializes lookup tables, sets up the board, and prints generated moves.
-
-board.h / board.cpp: Manages the state, memory, and initialization of the 64-bit chessboard.
-
-movegen.h / movegen.cpp: Contains the math, raycasting, and generateMoves() logic for producing standard algebraic notation moves (e.g., e2e4).
-
-🗺️ Roadmap (Next Steps)
-[ ] Make/Unmake Move: Implement functions to update the bitboards when a move is played and restore them when backtracking.
-
-[ ] Legal Move Filtering: Filter out pseudo-legal moves that leave the King in check.
-
-[ ] Special Moves: Implement Castling, En Passant, and Pawn Promotion.
-
-[ ] Evaluation: Write a function to score a board position (material + positional bonuses).
-
-[ ] Search Algorithm: Implement Minimax with Alpha-Beta Pruning to look ahead and find the best move.
+### User Interface
+- [ ] Develop custom Python UI.
+- [ ] Bind the C++ engine core to the Python frontend.
