@@ -5,11 +5,6 @@
 #include <vector>
 #include "board.h"
 
-struct Move {
-    int start;
-    int end;
-};
-
 inline int popFirstOne(std::uint64_t& bitboard);
 
 constexpr std::uint64_t notAFile  = 0xFEFEFEFEFEFEFEFEULL; 

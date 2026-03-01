@@ -956,4 +956,5 @@ CMakeFiles/CHESS_V2.dir/src/board.cpp.o: \
   /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/usr/include/c++/v1/__format/formatter_tuple.h \
   /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/usr/include/c++/v1/print \
   /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/usr/include/unistd.h \
-  /Users/roniosipov/Documents/chess_v2/src/board.h
+  /Users/roniosipov/Documents/chess_v2/src/board.h \
+  /Users/roniosipov/Documents/chess_v2/src/movegen.h

@@ -1,5 +1,8 @@
 #include <iostream>
 #include "board.h"
+#include "movegen.h"
+#include <vector>
+#define pb push_back
 
 Board::Board() {
     resetBoard();
@@ -63,4 +66,83 @@ void Board::printBoard() {
 
         printf("\n");
     }
+}
+
+void Board::makeMove(Move move) {
+    int start = move.start;
+    int end = move.end;
+    int color = sideToMove;
+    int enemyColor = color ^ 1;
+
+    int movedPiece = -1;
+    int capturedPiece = -1;
+
+    for(int p = PAWN; p <= KING; ++p) {
+        if(bitboards[color][p] & (1ULL << start)){
+            movedPiece = p;
+            break;
+        }
+    }
+
+    bitboards[color][movedPiece] &= ~(1ULL << start); //erase
+    bitboards[color][movedPiece] |= (1ULL << end);  //draw
+
+    if(allPieces & (1ULL << end)){
+        for(int p = PAWN; p <= KING; ++p) {
+            if(bitboards[enemyColor][p] & (1ULL << end)){
+                capturedPiece = p;
+                bitboards[enemyColor][p] &= ~(1ULL << end);
+                break;
+            }
+        }
+    }
+
+    UndoState state;
+    state.move = move;
+    state.movedPiece = movedPiece;
+    state.capturedPiece = capturedPiece;
+    history.pb(state);
+
+    whitePieces = 0ULL;
+    blackPieces = 0ULL;
+
+    for(int p = PAWN; p <= KING; ++p) {
+        whitePieces |= bitboards[WHITE][p];
+        blackPieces |= bitboards[BLACK][p];
+    }
+
+    allPieces = whitePieces | blackPieces;
+
+    sideToMove ^= 1;
+}
+
+void Board::unmakeMove() {
+    if(history.empty()) return;
+
+    UndoState undoState = history.back();
+    history.pop_back();
+
+    sideToMove ^= 1;
+    int color = sideToMove;
+    int enemyColor = color ^ 1;
+
+    int start = undoState.move.start;
+    int end = undoState.move.end;
+
+    bitboards[color][undoState.movedPiece] &= ~(1ULL << end);
+    bitboards[color][undoState.movedPiece] |= (1ULL << start);
+
+    if(undoState.capturedPiece != -1) {
+        bitboards[enemyColor][undoState.capturedPiece] |= (1ULL << end);
+    }
+
+    whitePieces = 0ULL;
+    blackPieces = 0ULL;
+
+    for(int p = PAWN; p <= KING; ++p) {
+        whitePieces |= bitboards[WHITE][p];
+        blackPieces |= bitboards[BLACK][p];
+    }
+
+    allPieces = whitePieces | blackPieces;
 }

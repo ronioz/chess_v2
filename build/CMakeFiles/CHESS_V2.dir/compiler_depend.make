@@ -958,7 +958,8 @@ CMakeFiles/CHESS_V2.dir/src/board.cpp.o: /Users/roniosipov/Documents/chess_v2/sr
   /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/clang/16/include/stdarg.h \
   /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/clang/16/include/stddef.h \
   /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/clang/16/include/stdint.h \
-  /Users/roniosipov/Documents/chess_v2/src/board.h
+  /Users/roniosipov/Documents/chess_v2/src/board.h \
+  /Users/roniosipov/Documents/chess_v2/src/movegen.h
 
 CMakeFiles/CHESS_V2.dir/src/main.cpp.o: /Users/roniosipov/Documents/chess_v2/src/main.cpp \
   /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/usr/include/Availability.h \
