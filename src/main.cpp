@@ -1,54 +1,30 @@
 #include "board.h"
 #include "movegen.h"
-#include <vector>
 #include <iostream>
-
-void printMoves(std::vector<Move> moves) {
-    printf("Total moves generated: %d\n", (int)moves.size());
-    for(const Move& move: moves) {
-        char startFile = 'a' + (move.start % 8);
-        char startRank = '1' + (move.start / 8);
-
-        char endFile = 'a' + (move.end % 8);
-        char endRank = '1' + (move.end / 8);
-
-        std::cout << startFile << startRank << endFile << endRank << std::endl;
-    }
-
-    printf("\n");
-}
+#include <chrono>
 
 int main() {
-    init();
-    Board board;
-    board.resetBoard();
+    init(); 
+    Board board; 
+    board.resetBoard(); 
 
-    printf("Starting Position!\n");
-    board.printBoard();
+    std::cout << "--- Starting Position ---\n";
+    board.printBoard(); 
 
-    std::vector<Move> moves = generateMoves(board);
-    Move e2e4 = {-1, -1};
-    for(const Move& m : moves) {
-        if(m.start == 12 && m.end == 28) {
-            e2e4 = m;
-            break;
-        }
-    }
+    int searchDepth = 5;
 
-    if(e2e4.start == -1) {
-        printf("Cannot play e2e4");
-        return 0;
-    }
+    std::cout << "\nStarting Perft Test to Depth " << searchDepth << "...\n";
 
-    printf("Playing move e2-e4!\n");
-    board.makeMove(e2e4);
-    printf("Updated board:\n");
-    board.printBoard();
+    auto startTime = std::chrono::high_resolution_clock::now();
 
-    printf("Unmake move e2-e4!\n");
-    board.unmakeMove();
-    printf("Updated board:\n");
-    board.printBoard();
-    
+    std::uint64_t totalNodes = perft(board, searchDepth);
+
+    auto endTime = std::chrono::high_resolution_clock::now();
+    std::chrono::duration<double> elapsed = endTime - startTime;
+
+    std::cout << "Total Nodes: " << totalNodes << "\n";
+    std::cout << "Time taken: " << elapsed.count() << " seconds\n";
+    std::cout << "Nodes per second: " << (uint64_t)(totalNodes / elapsed.count()) << "\n";
+
     return 0;
 }

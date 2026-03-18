@@ -16,8 +16,6 @@ struct UndoState {
     Move move;
     int movedPiece;
     int capturedPiece;
-    int castlingRights;
-    int enPassantSquare;
 };
 
 class Board {
@@ -27,7 +25,6 @@ class Board {
         void resetBoard();
         void makeMove(Move move);
         void unmakeMove();
-        bool isSquareAttacked(int square, int attackingColor);
 
         std::uint64_t bitboards[2][6];
         std::uint64_t whitePieces;
@@ -35,8 +32,6 @@ class Board {
         std::uint64_t allPieces;
         
         int sideToMove;
-        int castlingRights;
-        int enPassantSquare;
 
         std::vector<UndoState> history;
 };

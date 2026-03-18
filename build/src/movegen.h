@@ -23,9 +23,7 @@ std::uint64_t maskBishopAttacks(int square);
 std::uint64_t maskRookAttacks(int square);
 std::uint64_t getRookAttacks(int square, std::uint64_t occupancy);
 std::uint64_t getBishopAttacks(int square, std::uint64_t occupancy);
-std::vector<Move> generateMoves(Board& board);
-std::vector<Move> generateLegalMoves(Board& board);
-std::uint64_t perft(Board& board, int depth);
+std::vector<Move> generateMoves(const Board& board);
 void init();
 
 #endif

@@ -176,7 +176,7 @@ std::uint64_t getBishopAttacks(int square, std::uint64_t occupancy) {
     return attacks;
 }
 
-std::vector<Move> generateMoves(Board& board) {
+std::vector<Move> generateMoves(const Board& board) {
     std::vector<Move> moves;
     moves.reserve(256);
 
@@ -211,46 +211,6 @@ std::vector<Move> generateMoves(Board& board) {
         while(attacks) {
             int toSquare = popFirstOne(attacks);
             moves.pb({startSquare, toSquare});
-        }
-    }
-
-    //CASTLING
-
-    //WHITE (BOTH SIDES)
-
-    if(color == WHITE) {
-        if(board.castlingRights & 1) {
-            if(!board.allPieces & ((1ULL << 5) | (1ULL << 6))) {
-                if(!board.isSquareAttacked(4, BLACK) && !board.isSquareAttacked(5, BLACK)){
-                    moves.pb({4, 6});
-                }
-            }
-        }
-
-        if(board.castlingRights & 2) {
-            if(!board.allPieces & ((1ULL << 1) | (1ULL << 2) | (1ULL << 3))) {
-                if(!board.isSquareAttacked(1, BLACK) && !board.isSquareAttacked(2, BLACK) && !board.isSquareAttacked(3, BLACK)){
-                    moves.pb({4, 2});
-                }
-            }
-        }
-    }
-
-    else {
-        if(board.castlingRights & 4) {
-            if(!board.allPieces & ((1ULL << 61) | (1ULL << 62))) {
-                if(!board.isSquareAttacked(60, WHITE) && !board.isSquareAttacked(61, WHITE)){
-                    moves.pb({60, 62});
-                }
-            }
-        }
-
-        if(board.castlingRights & 8) {
-            if(!board.allPieces & ((1ULL << 57) | (1ULL << 58) | (1ULL << 59))) {
-                if(!board.isSquareAttacked(60, WHITE) && !board.isSquareAttacked(59, WHITE)){
-                    moves.pb({60, 58});
-                }
-            }
         }
     }
 
@@ -332,18 +292,6 @@ std::vector<Move> generateMoves(Board& board) {
                 moves.pb({startSquare, toSquare});
             }
         } //captures
-
-        if(board.enPassantSquare != -1) {
-            std::uint64_t epMask = (1ULL << board.enPassantSquare);
-            std::uint64_t tempEp = pawns;
-
-            while(tempEp) {
-                int startSquare = popFirstOne(tempEp);
-                if(pawnAttacks[WHITE][startSquare] & epMask) {
-                    moves.pb({startSquare, board.enPassantSquare});
-                }
-            }
-        }
     } else {
         std::uint64_t singlePushes = (pawns >> 8) & emptySquares;
         std::uint64_t temp = singlePushes;
@@ -353,7 +301,7 @@ std::vector<Move> generateMoves(Board& board) {
             moves.pb({toSquare + 8, toSquare});
         } //single push
 
-        const std::uint64_t rank5mask = 0x000000FF00000000ULL;;
+        const std::uint64_t rank5mask = 0x0000000FF0000000ULL;
         std::uint64_t doublePushes = (singlePushes >> 8) & emptySquares & rank5mask;
 
         while(doublePushes) {
@@ -372,58 +320,7 @@ std::vector<Move> generateMoves(Board& board) {
                 moves.pb({startSquare, toSquare});
             }
         } //captures
-
-        if(board.enPassantSquare != -1) {
-            std::uint64_t epMask = (1ULL << board.enPassantSquare);
-            std::uint64_t tempEp = pawns;
-
-            while(tempEp) {
-                int startSquare = popFirstOne(tempEp);
-                if (pawnAttacks[BLACK][startSquare] & epMask) {
-                    moves.pb({startSquare, board.enPassantSquare});
-                }
-            }
-        }
     }
 
     return moves;
-}
-
-std::vector<Move> generateLegalMoves(Board& board) {
-    std::vector<Move> allMoves = generateMoves(board);
-    std::vector<Move> legalMoves;
-    legalMoves.reserve(256);
-
-    int color = board.sideToMove;
-
-    for(const Move& move: allMoves) {
-        board.makeMove(move);
-
-        int kingSquare = __builtin_ctzll(board.bitboards[color][KING]);
-
-        if(!board.isSquareAttacked(kingSquare, color^1)) {
-            legalMoves.pb(move);
-        }
-
-        board.unmakeMove();
-    }
-
-    return legalMoves;
-}
-
-std::uint64_t perft(Board& board, int depth) {
-    if(depth == 0) {
-        return 1ULL;
-    }
-
-    std::uint64_t nodes = 0ULL;
-    std::vector<Move> moves = generateLegalMoves(board);
-
-    for(const Move& move: moves) {
-        board.makeMove(move);
-        nodes += perft(board, depth-1);
-        board.unmakeMove();
-    }
-
-    return nodes;
 }

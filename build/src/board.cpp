@@ -4,17 +4,6 @@
 #include <vector>
 #define pb push_back
 
-const int castlingUpdate[64] = {
-    13, 15, 15, 15, 12, 15, 15, 14,
-    15, 15, 15, 15, 15, 15, 15, 15,
-    15, 15, 15, 15, 15, 15, 15, 15,
-    15, 15, 15, 15, 15, 15, 15, 15,
-    15, 15, 15, 15, 15, 15, 15, 15,
-    15, 15, 15, 15, 15, 15, 15, 15,
-    15, 15, 15, 15, 15, 15, 15, 15,
-7, 15, 15, 15,  3, 15, 15, 11
-};
-
 Board::Board() {
     resetBoard();
 }
@@ -24,10 +13,6 @@ void Board::resetBoard() {
         for(int p = PAWN; p <= KING; ++p){
             bitboards[c][p] = 0ULL;
         }
-
-        sideToMove = WHITE;
-        castlingRights = 15;
-        enPassantSquare = -1;
     }
 
     bitboards[WHITE][PAWN]   = 0x000000000000FF00ULL;
@@ -99,11 +84,15 @@ void Board::makeMove(Move move) {
         }
     }
 
+    bitboards[color][movedPiece] &= ~(1ULL << start); //erase
+    bitboards[color][movedPiece] |= (1ULL << end);  //draw
+
     if(allPieces & (1ULL << end)){
         for(int p = PAWN; p <= KING; ++p) {
             if(bitboards[enemyColor][p] & (1ULL << end)){
                 capturedPiece = p;
-                break; 
+                bitboards[enemyColor][p] &= ~(1ULL << end);
+                break;
             }
         }
     }
@@ -112,51 +101,16 @@ void Board::makeMove(Move move) {
     state.move = move;
     state.movedPiece = movedPiece;
     state.capturedPiece = capturedPiece;
-    state.castlingRights = castlingRights;
-    state.enPassantSquare = enPassantSquare;
     history.pb(state);
-
-    bitboards[color][movedPiece] &= ~(1ULL << start);
-    bitboards[color][movedPiece] |= (1ULL << end);
-
-    if(movedPiece == KING && (end - start == 2 || start - end == 2)) {
-        if(end == 6) {
-            bitboards[WHITE][ROOK] &= ~(1ULL << 7);
-            bitboards[WHITE][ROOK] |= (1ULL << 5);
-        } else if(end == 2) {
-            bitboards[WHITE][ROOK] &= ~(1ULL << 0);
-            bitboards[WHITE][ROOK] |= (1ULL << 3);
-        } else if(end == 62) {
-            bitboards[BLACK][ROOK] &= ~(1ULL << 63);
-            bitboards[BLACK][ROOK] |= (1ULL << 61);
-        } else {
-            bitboards[BLACK][ROOK] &= ~(1ULL << 56);
-            bitboards[BLACK][ROOK] |= (1ULL << 59);
-        }
-    } //CASTLING
-
-    if(movedPiece == PAWN && (end - start == 16) || (start - end == 16)) {
-        enPassantSquare = (color == WHITE) ? start + 8 : start - 8;
-    } else {
-        enPassantSquare = -1;
-    } //EN PASSANT
-
-    if(capturedPiece != -1) {
-        bitboards[enemyColor][capturedPiece] &= ~(1ULL << end); 
-    } else if (movedPiece == PAWN && end == state.enPassantSquare) {
-        int victimSquare = (color == WHITE) ? end - 8 : end + 8;
-        bitboards[enemyColor][PAWN] &= ~(1ULL << victimSquare);
-    }
-
-    castlingRights &= castlingUpdate[start];
-    castlingRights &= castlingUpdate[end];
 
     whitePieces = 0ULL;
     blackPieces = 0ULL;
+
     for(int p = PAWN; p <= KING; ++p) {
         whitePieces |= bitboards[WHITE][p];
         blackPieces |= bitboards[BLACK][p];
     }
+
     allPieces = whitePieces | blackPieces;
 
     sideToMove ^= 1;
@@ -168,9 +122,6 @@ void Board::unmakeMove() {
     UndoState undoState = history.back();
     history.pop_back();
 
-    castlingRights = undoState.castlingRights;
-    enPassantSquare = undoState.enPassantSquare;
-
     sideToMove ^= 1;
     int color = sideToMove;
     int enemyColor = color ^ 1;
@@ -181,27 +132,8 @@ void Board::unmakeMove() {
     bitboards[color][undoState.movedPiece] &= ~(1ULL << end);
     bitboards[color][undoState.movedPiece] |= (1ULL << start);
 
-    if(undoState.movedPiece == KING && (start - end == 2 || end - start == 2)) {
-        if(end == 6) {
-            bitboards[WHITE][ROOK] &= ~(1ULL << 5);
-            bitboards[WHITE][ROOK] |= (1ULL << 7);
-        } else if(end == 2) {
-            bitboards[WHITE][ROOK] &= ~(1ULL << 3);
-            bitboards[WHITE][ROOK] |= (1ULL << 0);
-        } else if(end == 62) {
-            bitboards[BLACK][ROOK] &= ~(1ULL << 61);
-            bitboards[BLACK][ROOK] |= (1ULL << 63);
-        } else {
-            bitboards[BLACK][ROOK] &= ~(1ULL << 59);
-            bitboards[BLACK][ROOK] |= (1ULL << 56);
-        }
-    } //UNCASTLING
-
     if(undoState.capturedPiece != -1) {
         bitboards[enemyColor][undoState.capturedPiece] |= (1ULL << end);
-    } else if (undoState.movedPiece == PAWN && end == undoState.enPassantSquare) {
-        int victimSquare = (color == WHITE) ? end - 8 : end + 8;
-        bitboards[enemyColor][PAWN] |= (1ULL << victimSquare);
     }
 
     whitePieces = 0ULL;
@@ -213,18 +145,4 @@ void Board::unmakeMove() {
     }
 
     allPieces = whitePieces | blackPieces;
-}
-
-bool Board::isSquareAttacked(int square, int attackingColor) {
-    int defendingColor = attackingColor ^ 1;
-    std::uint64_t diagonalAttackers = bitboards[attackingColor][BISHOP] | bitboards[attackingColor][QUEEN];
-    std::uint64_t lineAttackers = bitboards[attackingColor][ROOK] | bitboards[attackingColor][QUEEN];
-
-    if(knightAttacks[square] & bitboards[attackingColor][KNIGHT]) return true;
-    if(kingAttacks[square] & bitboards[attackingColor][KING]) return true;
-    if(pawnAttacks[defendingColor][square] & bitboards[attackingColor][PAWN]) return true;
-    if(getBishopAttacks(square, allPieces) & diagonalAttackers) return true;
-    if(getRookAttacks(square, allPieces) & lineAttackers) return true;
-
-    return false;
 }

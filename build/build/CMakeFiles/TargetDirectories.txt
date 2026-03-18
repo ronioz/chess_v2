@@ -1,0 +1,3 @@
+/Users/roniosipov/Documents/chess_v2/build/CMakeFiles/CHESS_V2.dir
+/Users/roniosipov/Documents/chess_v2/build/CMakeFiles/edit_cache.dir
+/Users/roniosipov/Documents/chess_v2/build/CMakeFiles/rebuild_cache.dir

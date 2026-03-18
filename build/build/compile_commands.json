@@ -1,0 +1,26 @@
+[
+{
+  "directory": "/Users/roniosipov/Documents/chess_v2/build",
+  "command": "/usr/bin/clang++   -g -std=gnu++17 -arch arm64 -o CMakeFiles/CHESS_V2.dir/src/board.cpp.o -c /Users/roniosipov/Documents/chess_v2/src/board.cpp",
+  "file": "/Users/roniosipov/Documents/chess_v2/src/board.cpp",
+  "output": "CMakeFiles/CHESS_V2.dir/src/board.cpp.o"
+},
+{
+  "directory": "/Users/roniosipov/Documents/chess_v2/build",
+  "command": "/usr/bin/clang++   -g -std=gnu++17 -arch arm64 -o CMakeFiles/CHESS_V2.dir/src/main.cpp.o -c /Users/roniosipov/Documents/chess_v2/src/main.cpp",
+  "file": "/Users/roniosipov/Documents/chess_v2/src/main.cpp",
+  "output": "CMakeFiles/CHESS_V2.dir/src/main.cpp.o"
+},
+{
+  "directory": "/Users/roniosipov/Documents/chess_v2/build",
+  "command": "/usr/bin/clang++   -g -std=gnu++17 -arch arm64 -o CMakeFiles/CHESS_V2.dir/src/movegen.cpp.o -c /Users/roniosipov/Documents/chess_v2/src/movegen.cpp",
+  "file": "/Users/roniosipov/Documents/chess_v2/src/movegen.cpp",
+  "output": "CMakeFiles/CHESS_V2.dir/src/movegen.cpp.o"
+},
+{
+  "directory": "/Users/roniosipov/Documents/chess_v2/build",
+  "command": "/usr/bin/clang++   -g -std=gnu++17 -arch arm64 -o CMakeFiles/CHESS_V2.dir/src/search.cpp.o -c /Users/roniosipov/Documents/chess_v2/src/search.cpp",
+  "file": "/Users/roniosipov/Documents/chess_v2/src/search.cpp",
+  "output": "CMakeFiles/CHESS_V2.dir/src/search.cpp.o"
+}
+]
