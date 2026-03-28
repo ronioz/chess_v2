@@ -228,3 +228,30 @@ bool Board::isSquareAttacked(int square, int attackingColor) {
 
     return false;
 }
+
+int Board::evaluate() {
+    int score = 0;
+    int values[] = {100, 300, 300, 500, 900, 20000};
+
+    for(int p = PAWN; p <= KING; ++p) {
+        std::uint64_t w_pieces = bitboards[WHITE][p];
+        while(w_pieces) {
+            popFirstOne(w_pieces);
+            score += values[p];
+        }
+    }
+
+    for(int p = PAWN; p <= KING; ++p) {
+        std::uint64_t w_pieces = bitboards[BLACK][p];
+        while(w_pieces) {
+            popFirstOne(w_pieces);
+            score -= values[p];
+        }
+    }
+
+    return (sideToMove == WHITE) ? score : -score;
+}
+
+bool Board::isCapture(Move move) {
+    return allPieces & (1ULL << move.end);
+}

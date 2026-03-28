@@ -28,6 +28,8 @@ class Board {
         void makeMove(Move move);
         void unmakeMove();
         bool isSquareAttacked(int square, int attackingColor);
+        int evaluate();
+        bool isCapture(Move move);
 
         std::uint64_t bitboards[2][6];
         std::uint64_t whitePieces;
