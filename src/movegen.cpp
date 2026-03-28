@@ -220,7 +220,7 @@ std::vector<Move> generateMoves(Board& board) {
 
     if(color == WHITE) {
         if(board.castlingRights & 1) {
-            if(!board.allPieces & ((1ULL << 5) | (1ULL << 6))) {
+            if(!(board.allPieces & ((1ULL << 5) | (1ULL << 6)))) {
                 if(!board.isSquareAttacked(4, BLACK) && !board.isSquareAttacked(5, BLACK)){
                     moves.pb({4, 6});
                 }
@@ -228,7 +228,7 @@ std::vector<Move> generateMoves(Board& board) {
         }
 
         if(board.castlingRights & 2) {
-            if(!board.allPieces & ((1ULL << 1) | (1ULL << 2) | (1ULL << 3))) {
+            if(!(board.allPieces & ((1ULL << 2) | (1ULL << 3)))) {
                 if(!board.isSquareAttacked(1, BLACK) && !board.isSquareAttacked(2, BLACK) && !board.isSquareAttacked(3, BLACK)){
                     moves.pb({4, 2});
                 }
@@ -238,7 +238,7 @@ std::vector<Move> generateMoves(Board& board) {
 
     else {
         if(board.castlingRights & 4) {
-            if(!board.allPieces & ((1ULL << 61) | (1ULL << 62))) {
+            if(!(board.allPieces & ((1ULL << 61) | (1ULL << 62)))) {
                 if(!board.isSquareAttacked(60, WHITE) && !board.isSquareAttacked(61, WHITE)){
                     moves.pb({60, 62});
                 }
@@ -246,7 +246,7 @@ std::vector<Move> generateMoves(Board& board) {
         }
 
         if(board.castlingRights & 8) {
-            if(!board.allPieces & ((1ULL << 57) | (1ULL << 58) | (1ULL << 59))) {
+            if(!(board.allPieces & ((1ULL << 57) | (1ULL << 58) | (1ULL << 59)))) {
                 if(!board.isSquareAttacked(60, WHITE) && !board.isSquareAttacked(59, WHITE)){
                     moves.pb({60, 58});
                 }

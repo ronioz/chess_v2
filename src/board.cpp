@@ -135,11 +135,11 @@ void Board::makeMove(Move move) {
         }
     } //CASTLING
 
-    if(movedPiece == PAWN && (end - start == 16) || (start - end == 16)) {
+    if (movedPiece == PAWN && (end - start == 16 || start - end == 16)) {
         enPassantSquare = (color == WHITE) ? start + 8 : start - 8;
     } else {
         enPassantSquare = -1;
-    } //EN PASSANT
+    }
 
     if(capturedPiece != -1) {
         bitboards[enemyColor][capturedPiece] &= ~(1ULL << end); 
